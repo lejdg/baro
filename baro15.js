@@ -265,4 +265,3 @@
   setInterval(loadAllSymbols, 2000);
 
 })();
-``
