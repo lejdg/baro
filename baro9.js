@@ -59,7 +59,7 @@
       type: "POST",
       url: "/PdBoard/AddStaticTeambaroResult",
       data: {
-        PdBoardId: baroPdBoardId,
+        pdBoardId: baroPdBoardId,
         happy: 0, normal: 0, sad: 0, locked: false,
         chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
       }
