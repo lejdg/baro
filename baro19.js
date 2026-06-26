@@ -17,7 +17,7 @@
     return result;
   }
 
-  const baroPdBoardId = getRealBoardId();
+  const baroPdBoardId = "7018";
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
 
   function normalizeSymbolObject(obj){
