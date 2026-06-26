@@ -19,26 +19,9 @@
     };
   }
 
-  function stableStringify(obj){
-    return JSON.stringify(obj, Object.keys(obj).sort());
-  }
-
   function getBaroCurrentDate(){
     const now = new Date();
     return `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-  }
-
-  function generateStateHash(symbols){
-    let ordered = Object.keys(symbols)
-      .sort()
-      .map(k => k + ":" + stableStringify(symbols[k]))
-      .join("|");
-
-    let hash = 0;
-    for(let i = 0; i < ordered.length; i++){
-      hash = (hash * 31 + ordered.charCodeAt(i)) >>> 0;
-    }
-    return hash;
   }
 
   function initializeSession(){
@@ -55,10 +38,13 @@
     }
 
     $("#symbol-display").text(baroMySymbol);
+
+    console.log("[INIT]", baroSessionId, baroMySymbol);
   }
 
-  // ✅ SAVE (Backend kompatibel)
   function saveAllSymbols(){
+    console.log("[SAVE] sending", baroAllSymbols);
+
     $.ajax({
       type: "POST",
       url: "/PdBoard/AddStaticTeambaroResult",
@@ -73,16 +59,19 @@
           symbols: JSON.stringify(baroAllSymbols)
         })
       },
+      success: function(){
+        console.log("[SAVE SUCCESS]");
+      },
       error: function (xhr) {
-        console.log("SERVER ERROR:", xhr.responseText);
+        console.log("[SAVE ERROR]", xhr.responseText);
       }
     });
   }
 
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
     const $container = $("#container");
-    const w = $container.width();
-    const h = $container.height();
+    const w = $container.outerWidth();
+    const h = $container.outerHeight();
 
     const $s = $("<div class='stern'>" + symbol + "</div>")
       .attr("id", id)
@@ -93,23 +82,49 @@
     $container.append($s);
 
     if(isMine){
+      console.log("[DRAG INIT]", id);
+
       $s.draggable({
         containment: "#container",
-        start: () => { baroDraggingId = id; },
-        stop: (e, ui) => {
-          baroDraggingId = null;
 
-          const w2 = $("#container").width();
-          const h2 = $("#container").height();
+        start: (e, ui) => {
+          baroDraggingId = id;
+          console.log("[DRAG START]", id, ui.position);
+        },
+
+        drag: (e, ui) => {
+          console.log("[DRAG MOVE]", id, ui.position);
+        },
+
+        stop: (e, ui) => {
+          console.log("[DRAG STOP RAW]", id, ui.position);
+
+          const w2 = $("#container").outerWidth();
+          const h2 = $("#container").outerHeight();
+
+          console.log("[CONTAINER SIZE]", w2, h2);
+
+          const leftRel = ui.position.left / w2;
+          const topRel  = ui.position.top  / h2;
+
+          console.log("[CALC REL]", leftRel, topRel);
 
           baroAllSymbols[id] = {
-            left: +(ui.position.left / w2).toFixed(5),
-            top:  +(ui.position.top  / h2).toFixed(5),
+            left: +leftRel.toFixed(5),
+            top:  +topRel.toFixed(5),
             symbol: baroMySymbol,
             sessionId: baroSessionId
           };
 
+          console.log("[UPDATED STATE]", baroAllSymbols[id]);
+
           saveAllSymbols();
+
+          // kleines Delay gegen Poll überschreibung
+          setTimeout(() => {
+            baroDraggingId = null;
+            console.log("[DRAG END CLEAN]");
+          }, 200);
         }
       });
     }
@@ -120,13 +135,15 @@
   function addMySymbols(){
     const existing = Object.values(baroAllSymbols).filter(s => s.sessionId === baroSessionId);
 
+    console.log("[ADD SYMBOLS] existing", existing.length);
+
     if(existing.length >= 3){
       alert("Du hast bereits 3 Symbole!");
       return;
     }
 
     const $c = $("#container");
-    const CW = $c.width(), CH = $c.height();
+    const CW = $c.outerWidth(), CH = $c.outerHeight();
 
     for(let i = 0; i < 3; i++){
       const id   = baroSessionId + "_stern_" + Date.now() + "_" + i;
@@ -140,82 +157,14 @@
     saveAllSymbols();
   }
 
-  function removeMySymbols(){
-    $(`.stern[data-session="${baroSessionId}"]`).remove();
-
-    for(const key of Object.keys(baroAllSymbols)){
-      if(baroAllSymbols[key].sessionId === baroSessionId){
-        delete baroAllSymbols[key];
-      }
-    }
-
-    saveAllSymbols();
-  }
-
-  function clearAllSymbols(){
-    if(confirm("Wirklich ALLES löschen?")){
-      $(".stern").remove();
-      baroAllSymbols = {};
-      saveAllSymbols();
-    }
-  }
-
-  // ✅ SMART UPDATE (Diff)
-  function applySymbolDiff(normalized){
-    const $container = $("#container");
-    const w = $container.width();
-    const h = $container.height();
-
-    const incomingKeys = new Set(Object.keys(normalized));
-    const existingKeys = new Set(
-      $(".stern").map(function(){ return this.id; }).get()
-    );
-
-    // Entfernen
-    for(const key of existingKeys){
-      if(!incomingKeys.has(key) && key !== baroDraggingId){
-        $("#" + key).remove();
-      }
-    }
-
-    // Hinzufügen / Update
-    for(const [key, val] of Object.entries(normalized)){
-      const isMine = val.sessionId === baroSessionId;
-      const $existing = $("#" + key);
-
-      if($existing.length === 0){
-        createSymbolElement(key, val.symbol, val.left, val.top, val.sessionId, isMine);
-      } else {
-        if(key !== baroDraggingId){
-          $existing.css({
-            left: (val.left * w) + "px",
-            top:  (val.top  * h) + "px"
-          });
-        }
-      }
-    }
-
-    // Sync State
-    for(const [key, val] of Object.entries(normalized)){
-      if(key !== baroDraggingId){
-        baroAllSymbols[key] = val;
-      }
-    }
-
-    for(const key of Object.keys(baroAllSymbols)){
-      if(!incomingKeys.has(key) && key !== baroDraggingId){
-        delete baroAllSymbols[key];
-      }
-    }
-  }
-
-  // ✅ LOAD (mit Parse-Fix!)
   function loadAllSymbols(){
     $.ajax({
       type: "GET",
       url: "/PdBoard/GetTeamBaroChkPlace",
-      data: { pdBoardId: baroPdBoardId }, // ✅ FIX
+      data: { pdBoardId: baroPdBoardId },
       success: function(resp){
+        console.log("[LOAD RAW]", resp);
+
         if(!resp) return;
 
         let data;
@@ -223,7 +172,6 @@
 
         if(!data || data.date !== getBaroCurrentDate() || !data.symbols) return;
 
-        // ✅ FIX: DOUBLE JSON auflösen
         let parsedSymbols;
         try {
           parsedSymbols = typeof data.symbols === "string"
@@ -233,21 +181,9 @@
           return;
         }
 
-        const normalized = {};
-        for(const key of Object.keys(parsedSymbols).sort()){
-          normalized[key] = normalizeSymbolObject(parsedSymbols[key]);
-        }
+        console.log("[LOAD PARSED]", parsedSymbols);
 
-        const hashable = {};
-        for(const [k, v] of Object.entries(normalized)){
-          if(k !== baroDraggingId) hashable[k] = v;
-        }
-
-        const newHash = generateStateHash(hashable);
-        if(newHash === baroLastHash) return;
-
-        baroLastHash = newHash;
-        applySymbolDiff(normalized);
+        baroAllSymbols = parsedSymbols;
       }
     });
   }
@@ -255,13 +191,10 @@
   $(document).ready(function(){
     initializeSession();
     $("#addMyStarsBtn").click(addMySymbols);
-    $("#removeMyStarsBtn").click(removeMySymbols);
-    $("#clearAllBtn").click(clearAllSymbols);
 
     loadAllSymbols();
   });
 
-  // ✅ weniger Serverlast
   setInterval(loadAllSymbols, 2000);
 
 })();
