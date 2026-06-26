@@ -67,7 +67,7 @@
         happy: 1,
         normal: 0,
         sad: 0,
-        locked: false,
+        locked: locked,
         chkPlace: JSON.stringify({
           date: getBaroCurrentDate(),
           symbols: JSON.stringify(baroAllSymbols)
