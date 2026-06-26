@@ -8,10 +8,10 @@
 
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
 
-  // ✅ ECHTE BOARD ID holen
+  // ✅ echte Board-ID holen
   function getRealBoardId(){
     const match = window.location.pathname.match(/[A-F0-9-]{36}/);
-    return match ? match[0] : "7018"; // fallback
+    return match ? match[0] : "7018";
   }
 
   const baroPdBoardId = getRealBoardId();
@@ -21,7 +21,9 @@
     return `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
   }
 
+  // ✅ Session / eigenes Symbol
   function initializeSession(){
+
     baroSessionId = localStorage.getItem("barometer_session_id");
 
     if(!baroSessionId){
@@ -39,7 +41,8 @@
     $("#symbol-display").text(baroMySymbol);
   }
 
-  function createSymbolElement(id, symbol, leftRel, topRel, isMine){
+  // ✅ Symbol erstellen
+  function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
 
     const $container = $("#container");
     const w = $container.width();
@@ -47,6 +50,7 @@
 
     const $s = $("<div class='stern'>" + symbol + "</div>")
       .attr("id", id)
+      .attr("data-session", ownerSessionId)
       .addClass(isMine ? "my-symbol" : "other-symbol")
       .css({
         left: (leftRel * w) + "px",
@@ -62,13 +66,14 @@
           baroDraggingId = id;
         },
         stop: (e, ui) => {
+
           baroDraggingId = null;
 
           const w2 = $("#container").width();
           const h2 = $("#container").height();
 
-          baroAllSymbols[id].left = ui.position.left / w2;
-          baroAllSymbols[id].top  = ui.position.top  / h2;
+          baroAllSymbols[id].left = +(ui.position.left / w2).toFixed(5);
+          baroAllSymbols[id].top  = +(ui.position.top  / h2).toFixed(5);
 
           saveAllSymbols();
         }
@@ -78,7 +83,62 @@
     return $s;
   }
 
-  // ✅ SYMBOLE LADEN (aus echter API)
+  // ✅ eigene Symbole platzieren
+  function addMySymbols(){
+
+    const existing = Object.values(baroAllSymbols).filter(s => s.sessionId === baroSessionId);
+
+    if(existing.length >= 3){
+      alert("Du hast bereits 3 Symbole!");
+      return;
+    }
+
+    const $c = $("#container");
+    const CW = $c.width(), CH = $c.height();
+
+    for(let i = 0; i < 3; i++){
+
+      const id = baroSessionId + "_stern_" + Date.now() + "_" + i;
+
+      const left = +((100 + i * 80) / CW).toFixed(5);
+      const top  = +(100 / CH).toFixed(5);
+
+      createSymbolElement(id, baroMySymbol, left, top, baroSessionId, true);
+
+      baroAllSymbols[id] = {
+        left,
+        top,
+        symbol: baroMySymbol,
+        sessionId: baroSessionId
+      };
+    }
+
+    saveAllSymbols();
+  }
+
+  function removeMySymbols(){
+
+    $(".stern[data-session='" + baroSessionId + "']").remove();
+
+    for(const key in baroAllSymbols){
+      if(baroAllSymbols[key].sessionId === baroSessionId){
+        delete baroAllSymbols[key];
+      }
+    }
+
+    saveAllSymbols();
+  }
+
+  function clearAllSymbols(){
+
+    if(confirm("Alles löschen?")){
+      $(".stern").remove();
+      baroAllSymbols = {};
+      saveAllSymbols();
+    }
+  }
+
+  // ✅ SERVER-DATEN LADEN
   function loadAllSymbols(){
 
     $.ajax({
@@ -91,12 +151,13 @@
 
         const data = typeof resp === "string" ? JSON.parse(resp) : resp;
 
-        $(".stern").remove();
-        baroAllSymbols = {};
+        $(".stern").not(".my-symbol").remove();
 
         Object.keys(data).forEach(key => {
 
           if(key.startsWith("baro")){
+
+            if($("#" + key).length) return;
 
             let emoji = "⚠️";
 
@@ -107,12 +168,13 @@
             const left = Math.random() * 0.8;
             const top  = Math.random() * 0.8;
 
-            createSymbolElement(key, emoji, left, top, false);
+            createSymbolElement(key, emoji, left, top, key, false);
 
             baroAllSymbols[key] = {
               left,
               top,
-              symbol: emoji
+              symbol: emoji,
+              sessionId: key
             };
           }
         });
@@ -120,7 +182,7 @@
     });
   }
 
-  // ✅ SPEICHERN (richtige Struktur!)
+  // ✅ SPEICHERN (angepasst an Backend)
   function saveAllSymbols(){
 
     const data = {
@@ -128,21 +190,19 @@
       date: getBaroCurrentDate()
     };
 
-    // 👉 Test-weise auf bekannte IDs mappen
     let i = 0;
 
     Object.values(baroAllSymbols).forEach(sym => {
 
-      // ⚠️ DAS ist wichtig:
-      // hier brauchst du echte IDs wie baro63817
-      const fakeId = ["63817","63818","63819"][i] || "63817";
+      const fakeIds = ["63817","63818","63819"];
+      const id = fakeIds[i % fakeIds.length];
 
-      data["baro" + fakeId] = 
+      data["baro" + id] =
         sym.symbol === "🔆" ? "Happy" :
         sym.symbol === "⚡" ? "Normal" :
         sym.symbol === "☠️" ? "Sad" : "Normal";
 
-      data["comment-" + fakeId] = "";
+      data["comment-" + id] = "";
 
       i++;
     });
@@ -160,47 +220,7 @@
     });
   }
 
-  function addMySymbols(){
-
-    const $c = $("#container");
-    const CW = $c.width();
-    const CH = $c.height();
-
-    for(let i = 0; i < 3; i++){
-
-      const id = baroSessionId + "_" + Date.now() + "_" + i;
-
-      const left = (100 + i * 80) / CW;
-      const top  = 100 / CH;
-
-      createSymbolElement(id, baroMySymbol, left, top, true);
-
-      baroAllSymbols[id] = {
-        left,
-        top,
-        symbol: baroMySymbol
-      };
-    }
-
-    saveAllSymbols();
-  }
-
-  function removeMySymbols(){
-
-    $(".my-symbol").remove();
-    baroAllSymbols = {};
-    saveAllSymbols();
-  }
-
-  function clearAllSymbols(){
-
-    if(confirm("Alles löschen?")){
-      $(".stern").remove();
-      baroAllSymbols = {};
-      saveAllSymbols();
-    }
-  }
-
+  // ✅ INIT
   $(document).ready(function(){
 
     console.log("✅ Barometer gestartet");
