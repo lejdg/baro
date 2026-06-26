@@ -14,7 +14,7 @@
     return match ? match[0] : "7018";
   }
 
-  const baroPdBoardId = getRealBoardId();
+ const baroPdBoardId = document.querySelector("#PdBoardId")?.value || "7018";
 
   function getBaroCurrentDate(){
     const now = new Date();
