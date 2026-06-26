@@ -60,20 +60,16 @@ function saveAllSymbols(){
     url: "/PdBoard/AddStaticTeambaroResult",
     data: {
       PdBoardId: $("#PdBoardId").val(),
-      happy: 0,
-      normal: 0,
-      sad: 0,
-      locked: false,
       chkPlace: JSON.stringify({
         date: getBaroCurrentDate(),
         symbols: baroAllSymbols
       })
     },
-    success: function(res){
+    success: function(){
       console.log("✅ gespeichert");
     },
     error: function(err){
-      console.log("❌ Fehler:", err.responseText);
+      console.log("❌ Server sagt:", err.responseText);
     }
   });
 }
