@@ -63,10 +63,10 @@
         happy: 0, normal: 0, sad: 0, locked: false,
         //chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
         
-chkPlace: JSON.stringify({
+/*chkPlace: JSON.stringify({
   date: getBaroCurrentDate(),
   symbols: JSON.stringify(baroAllSymbols)  
-})
+})*/
 
       }
     });
