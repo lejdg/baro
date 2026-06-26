@@ -284,9 +284,19 @@
         }
 
         const normalized = {};
-        for(const key of Object.keys(data.symbols).sort()){
-          normalized[key] = normalizeSymbolObject(data.symbols[key]);
-        }
+
+for(const key of Object.keys(data)){
+  if(!key.startsWith("baro")) continue;
+
+  const mood = data[key];
+
+  normalized[key] = {
+    left: Math.random() * 0.8 + 0.1,   // Fake-Position
+    top: Math.random() * 0.8 + 0.1,
+    symbol: mood,                      // oder Mapping
+    sessionId: key.replace("baro", "")
+  };
+}
 
         const hashable = {};
         for(const [k, v] of Object.entries(normalized)){
