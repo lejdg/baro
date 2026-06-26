@@ -54,17 +54,29 @@
     $("#symbol-display").text(baroMySymbol);
   }
 
-  function saveAllSymbols(){
-    $.ajax({
-      type: "POST",
-      url: "/PdBoard/AddStaticTeambaroResult",
-      data: {
-        PdBoardId: baroPdBoardId,
-        happy: 0, normal: 0, sad: 0, locked: false,
-        chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
-      }
-    });
-  }
+function saveAllSymbols(){
+  $.ajax({
+    type: "POST",
+    url: "/PdBoard/AddStaticTeambaroResult",
+    data: {
+      PdBoardId: $("#PdBoardId").val(),
+      happy: 0,
+      normal: 0,
+      sad: 0,
+      locked: false,
+      chkPlace: JSON.stringify({
+        date: getBaroCurrentDate(),
+        symbols: baroAllSymbols
+      })
+    },
+    success: function(res){
+      console.log("✅ gespeichert");
+    },
+    error: function(err){
+      console.log("❌ Fehler:", err.responseText);
+    }
+  });
+}
 
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
     const $container = $("#container");
