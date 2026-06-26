@@ -132,6 +132,22 @@
     return $s;
   }
 
+  function removeMySymbols(){
+  console.log("[REMOVE] before", baroAllSymbols);
+
+  $(`.stern[data-session="${baroSessionId}"]`).remove();
+
+  for(const key of Object.keys(baroAllSymbols)){
+    if(baroAllSymbols[key].sessionId === baroSessionId){
+      delete baroAllSymbols[key];
+    }
+  }
+
+  console.log("[REMOVE] after", baroAllSymbols);
+
+  saveAllSymbols();
+}
+
   function addMySymbols(){
     const existing = Object.values(baroAllSymbols).filter(s => s.sessionId === baroSessionId);
 
