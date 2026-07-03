@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 23");
+  console.log("BARO VERSION 24");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -412,7 +412,7 @@ console.log(
 
     loadAllSymbols();
 
-    setInterval(loadAllSymbols, 1000);
+    //setInterval(loadAllSymbols, 1000);
 
   });
 
