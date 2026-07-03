@@ -1,0 +1,92 @@
+$(document).ready(function () {
+
+    const pdBoardId = "7018";
+    const storageField = "comment-63778";
+
+    // Symbol erzeugen
+    const symbol = $("<div>TEST</div>")
+        .css({
+            position: "absolute",
+            left: "100px",
+            top: "100px",
+            background: "yellow",
+            padding: "10px",
+            cursor: "move",
+            border: "1px solid black"
+        });
+
+    $("#container").append(symbol);
+
+    // Laden
+    $.ajax({
+        type: "GET",
+        url: "/PdBoard/GetTeamBaroChkPlace",
+        data: {
+            pdBoardId: pdBoardId
+        },
+        success: function (resp) {
+
+            try {
+
+                const data = JSON.parse(resp);
+
+                if (data[storageField]) {
+
+                    const pos = JSON.parse(data[storageField]);
+
+                    symbol.css({
+                        left: pos.left + "px",
+                        top: pos.top + "px"
+                    });
+
+                    console.log("Position geladen", pos);
+                }
+
+            } catch (e) {
+                console.log("Keine gespeicherte Position");
+            }
+        }
+    });
+
+    // Drag & Drop
+    symbol.draggable({
+
+        containment: "#container",
+
+        stop: function (event, ui) {
+
+            const pos = {
+                left: ui.position.left,
+                top: ui.position.top
+            };
+
+            console.log("Speichern", pos);
+
+            const fields = {
+                date: "03/07/2026"
+            };
+
+            fields[storageField] = JSON.stringify(pos);
+
+            $.ajax({
+                type: "POST",
+                url: "/PdBoard/AddStaticTeambaroResult",
+                data: {
+                    pdBoardId: pdBoardId,
+                    happy: 0,
+                    normal: 0,
+                    sad: 0,
+                    locked: false,
+                    chkPlace: JSON.stringify(fields)
+                },
+                success: function () {
+                    console.log("Gespeichert");
+                },
+                error: function (xhr) {
+                    console.log("FEHLER", xhr);
+                }
+            });
+        }
+    });
+
+});
