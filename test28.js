@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 27");
+  console.log("BARO VERSION 28");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -109,8 +109,6 @@ function saveAllSymbols(){
 
 }
 
-
-
 function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
 
   const $container = $("#container");
@@ -118,28 +116,25 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
   const w = $container.width();
   const h = $container.height();
 
- const $s = $("<div>" + symbol + "</div>");
-
-$s.css({
-    position: "absolute",
-    left: (leftRel * w) + "px",
-    top: (topRel * h) + "px",
-    background: "yellow",
-    border: "1px solid black",
-    padding: "10px",
-    cursor: "move",
-    zIndex: 999999
-});
-
+  const $s = $("<div class='stern'>" + symbol + "</div>")
+    .attr("id", id)
+    .attr("data-session", ownerSessionId)
+    .addClass(isMine ? "my-symbol" : "other-symbol")
+    .css({
+      position: "absolute",
+      left: (leftRel * w) + "px",
+      top: (topRel * h) + "px",
+      background: "yellow",
+      border: "1px solid black",
+      padding: "10px",
+      cursor: "move",
+      zIndex: 999999,
+      pointerEvents: "auto"
+    });
 
   $container.append($s);
 
-  console.log(
-    "CREATE",
-    id,
-    "isMine=",
-    isMine
-  );
+  console.log("CREATE", id, "isMine=", isMine);
 
   $s.on("mousedown", function(){
     console.log("MOUSEDOWN", id);
@@ -152,18 +147,9 @@ $s.css({
   if(isMine){
 
     console.log("DRAG BIND", id);
+    console.log("AFTER DRAGGABLE", typeof $s.draggable);
 
     $s.draggable({
-
-console.log(
-  "AFTER DRAGGABLE",
-  typeof $s.draggable
-);
-
-console.log(
-  "HAS CLASS",
-  $s.hasClass("ui-draggable")
-);
 
       containment: document.getElementById("container"),
 
@@ -211,6 +197,11 @@ console.log(
         saveAllSymbols();
       }
     });
+
+    console.log(
+      "HAS CLASS",
+      $s.hasClass("ui-draggable")
+    );
 
     console.log(
       "DRAG OBJECT",
