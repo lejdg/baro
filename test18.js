@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 29");
+  console.log("BARO VERSION 18");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -75,10 +75,12 @@
 
 function saveAllSymbols(){
 
-  const state = {
-    date: getBaroCurrentDate(),
-    "comment-63778": "{\"x\":1}"
-  };
+
+const state = {
+  date: getBaroCurrentDate(),
+  "comment-63778": "☠️"
+};
+
 
   console.log(state);
 
