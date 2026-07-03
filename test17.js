@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 28");
+  console.log("BARO VERSION 29");
 
   let baroSessionId = null;
   let baroMySymbol = null;
