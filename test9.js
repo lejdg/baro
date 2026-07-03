@@ -2,8 +2,17 @@ console.log("START");
 
 window.addEventListener("load", function () {
 
-    console.log("LOAD");
+    const el = document.getElementById("test");
 
+    el.addEventListener("mousedown", function(){
+        console.log("MOUSEDOWN");
+    });
+
+    el.addEventListener("mouseup", function(){
+        console.log("MOUSEUP");
+    });
+
+    console.log("LOAD");
     console.log("Test gefunden:", $("#test").length);
     console.log("Draggable:", typeof $.fn.draggable);
 
