@@ -1,9 +1,12 @@
+$(function(){
 
-console.log("SCRIPT GELADEN");
+    console.log("READY");
 
-setTimeout(function(){
+    $("#test").draggable({
+        containment:"#container",
+        stop:function(e,ui){
+            console.log(ui.position);
+        }
+    });
 
-    console.log("container", $("#container").length);
-    console.log("test", $("#test").length);
-
-},5000);
+});
