@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 25");
+  console.log("BARO VERSION 26");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -113,65 +113,101 @@ function saveAllSymbols(){
 
 function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
 
-    const $container = $("#container");
+  const $container = $("#container");
 
-    const w = $container.width();
-    const h = $container.height();
+  const w = $container.width();
+  const h = $container.height();
 
-    const $s = $("<div class='stern'>" + symbol + "</div>")
-      .attr("id", id)
-      .attr("data-session", ownerSessionId)
-      .addClass(isMine ? "my-symbol" : "other-symbol")
-      .css({
-        left: (leftRel * w) + "px",
-        top: (topRel * h) + "px"
-      });
+  const $s = $("<div class='stern'>" + symbol + "</div>")
+    .attr("id", id)
+    .attr("data-session", ownerSessionId)
+    .addClass(isMine ? "my-symbol" : "other-symbol")
+    .css({
+      left: (leftRel * w) + "px",
+      top: (topRel * h) + "px",
+      position: "absolute",
+      zIndex: 999999,
+      pointerEvents: "auto"
+    });
 
-    $container.append($s);
+  $container.append($s);
 
-    if(isMine){
-console.log("DRAG BIND", id);
-      $s.draggable({
+  console.log(
+    "CREATE",
+    id,
+    "isMine=",
+    isMine
+  );
 
-        containment: document.getElementById("container"),
+  $s.on("mousedown", function(){
+    console.log("MOUSEDOWN", id);
+  });
 
-        start: () => {
+  $s.on("mouseup", function(){
+    console.log("MOUSEUP", id);
+  });
 
-          console.log("START DRAG", id);
+  if(isMine){
 
-          baroDraggingId = id;
-        },
+    console.log("DRAG BIND", id);
 
-        stop: (e, ui) => {
+    $s.draggable({
 
-          console.log("STOP DRAG", id);
+      containment: document.getElementById("container"),
 
-          baroDraggingId = null;
+      start: function(){
 
-          const w2 = $("#container").width();
-          const h2 = $("#container").height();
+        console.log("START DRAG", id);
 
-          baroAllSymbols[id] = {
+        baroDraggingId = id;
+      },
 
-            left: +(ui.position.left / w2).toFixed(5),
+      drag: function(e, ui){
 
-            top: +(ui.position.top / h2).toFixed(5),
+        console.log(
+          "DRAGGING",
+          ui.position.left,
+          ui.position.top
+        );
+      },
 
-            symbol: baroMySymbol,
+      stop: function(e, ui){
 
-            sessionId: baroSessionId
-          };
+        console.log("STOP DRAG", id);
 
-          console.log("SAVE", baroAllSymbols[id]);
+        baroDraggingId = null;
 
-          saveAllSymbols();
-        }
+        const w2 = $("#container").width();
+        const h2 = $("#container").height();
 
-      });
-    }
+        baroAllSymbols[id] = {
 
-    return $s;
+          left: +(ui.position.left / w2).toFixed(5),
+
+          top: +(ui.position.top / h2).toFixed(5),
+
+          symbol: baroMySymbol,
+
+          sessionId: baroSessionId
+        };
+
+        console.log(
+          "SAVE",
+          baroAllSymbols[id]
+        );
+
+        saveAllSymbols();
+      }
+    });
+
+    console.log(
+      "DRAG OBJECT",
+      $s.data("ui-draggable")
+    );
   }
+
+  return $s;
+}
 
   function addMySymbols(){
 
