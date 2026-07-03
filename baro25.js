@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-
+console.log("BARO VERSION 25");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
