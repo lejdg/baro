@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 28");
+  console.log("BARO VERSION 29");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -149,9 +149,34 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
     console.log("DRAG BIND", id);
     console.log("AFTER DRAGGABLE", typeof $s.draggable);
 
-    $s.draggable({
+console.log(
+  "JQUERY",
+  $.fn.jquery
+);
 
-      containment: document.getElementById("container"),
+console.log(
+  "DRAGGABLE FUNC",
+  typeof $.fn.draggable
+);
+
+console.log(
+  "ELEMENT",
+  $s[0]
+);
+    
+$s.draggable();
+
+console.log(
+  "HAS CLASS",
+  $s.hasClass("ui-draggable")
+);
+
+console.log(
+  "DRAG OBJECT",
+  $s.data("ui-draggable")
+);
+
+
 
       start: function(){
 
