@@ -3,7 +3,9 @@ console.log("START");
 
 window.addEventListener("load", function(){
 
-    $("#test").draggable();
+    $("#test").draggable({
+        containment: document.getElementById("container")
+    });
 
     console.log("DRAG AKTIV");
 
