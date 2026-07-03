@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 22");
+  console.log("BARO VERSION 23");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -269,7 +269,19 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
 
     for(const [key,val] of Object.entries(normalized)){
 
+console.log(
+  "CHECK SESSION",
+  val.sessionId,
+  baroSessionId
+);
+
       const isMine = val.sessionId === baroSessionId;
+
+console.log(
+  "ISMINE",
+  key,
+  isMine
+);
 
       const $existing = $("#" + key);
 
