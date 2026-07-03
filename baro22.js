@@ -7,6 +7,8 @@
   let baroOtherFields = {};   // NEU: bewahrt alle Nicht-Symbol-Felder (z.B. baroXXXX, comment-XXXX) aus chkPlace
   let baroDraggingId = null;   // ← statt baroIsDragging: trackt welches Element gezogen wird
   let baroLastHash = null;
+  let baroLastEditAt = {};     // NEU: id -> Zeitstempel der letzten lokalen Änderung (Anti-Race-Condition)
+  const BARO_GRACE_MS = 2500;  // NEU: solange wird ein frisch bearbeitetes Symbol vor Server-Overwrites geschützt
 
   const baroPdBoardId = "7018";
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
@@ -108,6 +110,7 @@
             symbol: baroMySymbol,
             sessionId: baroSessionId
           };
+          baroLastEditAt[id] = Date.now(); // NEU: schützt vor Overwrite durch zeitgleiches Polling
           saveAllSymbols();
         }
       });
@@ -185,8 +188,11 @@
         createSymbolElement(key, val.symbol, val.left, val.top, val.sessionId, isMine);
       } else {
         // Bestehendes Symbol → Position nur aktualisieren wenn es NICHT
-        // gerade von diesem User gezogen wird
-        if(key !== baroDraggingId){
+        // gerade von diesem User gezogen wird UND nicht kürzlich lokal
+        // geändert wurde (Grace Period gegen Race Condition mit dem Polling,
+        // während unser eigenes saveAllSymbols() noch unterwegs zum Server ist)
+        const recentlyEdited = baroLastEditAt[key] && (Date.now() - baroLastEditAt[key] < BARO_GRACE_MS);
+        if(key !== baroDraggingId && !recentlyEdited){
           $existing.css({
             left: (val.left * w) + "px",
             top:  (val.top  * h) + "px"
@@ -195,15 +201,17 @@
       }
     }
 
-    // Lokalen State synchronisieren (außer das gezogene Element)
+    // Lokalen State synchronisieren (außer das gezogene Element und kürzlich lokal editierte)
     for(const [key, val] of Object.entries(normalized)){
-      if(key !== baroDraggingId){
+      const recentlyEdited = baroLastEditAt[key] && (Date.now() - baroLastEditAt[key] < BARO_GRACE_MS);
+      if(key !== baroDraggingId && !recentlyEdited){
         baroAllSymbols[key] = val;
       }
     }
-    // Lokal gelöschte entfernen
+    // Lokal gelöschte entfernen (aber keine kürzlich lokal editierten)
     for(const key of Object.keys(baroAllSymbols)){
-      if(!incomingKeys.has(key) && key !== baroDraggingId){
+      const recentlyEdited = baroLastEditAt[key] && (Date.now() - baroLastEditAt[key] < BARO_GRACE_MS);
+      if(!incomingKeys.has(key) && key !== baroDraggingId && !recentlyEdited){
         delete baroAllSymbols[key];
       }
     }
@@ -249,6 +257,14 @@
         baroLastHash = newHash;
 
         applySymbolDiff(normalized);
+
+        // Alte Grace-Period-Einträge aufräumen, damit das Objekt nicht wächst
+        const now = Date.now();
+        for(const key of Object.keys(baroLastEditAt)){
+          if(now - baroLastEditAt[key] > BARO_GRACE_MS){
+            delete baroLastEditAt[key];
+          }
+        }
       }
     });
   }
