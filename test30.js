@@ -144,83 +144,13 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
     console.log("MOUSEUP", id);
   });
 
-if(isMine){
+  if(isMine){
 
-  console.log("DRAG BIND", id);
-  console.log("AFTER DRAGGABLE", typeof $s.draggable);
+    console.log("DRAG BIND", id);
+    console.log("JQUERY", $.fn.jquery);
+    console.log("DRAGGABLE FUNC", typeof $.fn.draggable);
 
-  console.log("JQUERY", $.fn.jquery);
-
-  console.log(
-    "DRAGGABLE FUNC",
-    typeof $.fn.draggable
-  );
-
-  console.log(
-    "ELEMENT",
-    $s[0]
-  );
-
-  $s.draggable({
-
-    start: function(){
-
-      console.log("START DRAG", id);
-
-      baroDraggingId = id;
-    },
-
-    drag: function(e, ui){
-
-      console.log(
-        "DRAGGING",
-        ui.position.left,
-        ui.position.top
-      );
-    },
-
-    stop: function(e, ui){
-
-      console.log("STOP DRAG", id);
-
-      baroDraggingId = null;
-
-      const w2 = $("#container").width();
-      const h2 = $("#container").height();
-
-      baroAllSymbols[id] = {
-
-        left: +(ui.position.left / w2).toFixed(5),
-
-        top: +(ui.position.top / h2).toFixed(5),
-
-        symbol: baroMySymbol,
-
-        sessionId: baroSessionId
-      };
-
-      console.log(
-        "SAVE",
-        baroAllSymbols[id]
-      );
-
-      saveAllSymbols();
-    }
-
-  });
-
-  console.log(
-    "HAS CLASS",
-    $s.hasClass("ui-draggable")
-  );
-
-  console.log(
-    "DRAG OBJECT",
-    $s.data("ui-draggable")
-  );
-}
-
-
+    $s.draggable({
 
       start: function(){
 
@@ -248,20 +178,13 @@ if(isMine){
         const h2 = $("#container").height();
 
         baroAllSymbols[id] = {
-
           left: +(ui.position.left / w2).toFixed(5),
-
           top: +(ui.position.top / h2).toFixed(5),
-
           symbol: baroMySymbol,
-
           sessionId: baroSessionId
         };
 
-        console.log(
-          "SAVE",
-          baroAllSymbols[id]
-        );
+        console.log("SAVE", baroAllSymbols[id]);
 
         saveAllSymbols();
       }
