@@ -77,12 +77,13 @@ function saveAllSymbols(){
 
   const state = {
     date: getBaroCurrentDate(),
-    "comment-63778": "TEST"
+    "comment-63778": "{\"x\":1}"
   };
 
   console.log(state);
 
   $.ajax({
+
     type: "POST",
     url: "/PdBoard/AddStaticTeambaroResult",
 
@@ -100,9 +101,11 @@ function saveAllSymbols(){
     },
 
     error: function(xhr){
-      console.log("FEHLER", xhr.status, xhr.responseText);
+      console.log("FEHLER", xhr.status);
     }
+
   });
+
 }
 
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
