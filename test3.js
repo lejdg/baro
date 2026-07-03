@@ -1,6 +1,8 @@
-$(function(){
 
-    console.log("READY");
+window.addEventListener("load", function(){
+
+    console.log("LOAD");
+    console.log("jQuery", typeof $);
 
     $("#test").draggable({
         containment:"#container",
