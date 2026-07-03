@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 26");
+  console.log("BARO VERSION 27");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -73,69 +73,37 @@
     $("#symbol-display").text(baroMySymbol);
   }
 
-  function saveAllSymbols(){
+function saveAllSymbols(){
 
-    $.ajax({
-      type: "GET",
-      url: "/PdBoard/GetTeamBaroChkPlace",
-      data: {
-        pdBoardId: baroPdBoardId
-      },
+  const state = {
+    date: getBaroCurrentDate(),
+    "comment-63778": "TEST"
+  };
 
-      success: function(resp){
+  console.log(state);
 
-        let state = {};
+  $.ajax({
+    type: "POST",
+    url: "/PdBoard/AddStaticTeambaroResult",
 
-        try{
-          state = resp ? JSON.parse(resp) : {};
-        }
-        catch(e){
-          state = {};
-        }
+    data: {
+      pdBoardId: baroPdBoardId,
+      happy: 0,
+      normal: 0,
+      sad: 0,
+      locked: false,
+      chkPlace: JSON.stringify(state)
+    },
 
-        state.date = getBaroCurrentDate();
+    success: function(){
+      console.log("GESPEICHERT");
+    },
 
-        let existing = state[BARO_STORAGE_FIELD] || "";
-
-        existing = existing
-          .replace(/__BARO__.*$/s,'')
-          .trim();
-
-        state[BARO_STORAGE_FIELD] =
-          existing +
-          (existing ? "\n" : "") +
-          "__BARO__" +
-          JSON.stringify(baroAllSymbols);
-
-        console.log("POST DATA", state);
-
-        $.ajax({
-
-          type: "POST",
-          url: "/PdBoard/AddStaticTeambaroResult",
-
-          data: {
-            pdBoardId: baroPdBoardId,
-            happy: 0,
-            normal: 0,
-            sad: 0,
-            locked: false,
-            chkPlace: JSON.stringify(state)
-          },
-
-          success: function(){
-            console.log("BARO gespeichert");
-          },
-
-          error: function(xhr){
-            console.log("BARO Fehler", xhr.status);
-          }
-
-        });
-
-      }
-    });
-  }
+    error: function(xhr){
+      console.log("FEHLER", xhr.status, xhr.responseText);
+    }
+  });
+}
 
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
 
