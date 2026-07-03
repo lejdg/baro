@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 26");
+  console.log("BARO VERSION 27");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -118,17 +118,19 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
   const w = $container.width();
   const h = $container.height();
 
-  const $s = $("<div class='stern'>" + symbol + "</div>")
-    .attr("id", id)
-    .attr("data-session", ownerSessionId)
-    .addClass(isMine ? "my-symbol" : "other-symbol")
-    .css({
-      left: (leftRel * w) + "px",
-      top: (topRel * h) + "px",
-      position: "absolute",
-      zIndex: 999999,
-      pointerEvents: "auto"
-    });
+ const $s = $("<div>" + symbol + "</div>");
+
+$s.css({
+    position: "absolute",
+    left: (leftRel * w) + "px",
+    top: (topRel * h) + "px",
+    background: "yellow",
+    border: "1px solid black",
+    padding: "10px",
+    cursor: "move",
+    zIndex: 999999
+});
+
 
   $container.append($s);
 
@@ -152,6 +154,16 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
     console.log("DRAG BIND", id);
 
     $s.draggable({
+
+console.log(
+  "AFTER DRAGGABLE",
+  typeof $s.draggable
+);
+
+console.log(
+  "HAS CLASS",
+  $s.hasClass("ui-draggable")
+);
 
       containment: document.getElementById("container"),
 
