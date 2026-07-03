@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 19");
+  console.log("BARO VERSION 20");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -77,10 +77,24 @@ function saveAllSymbols(){
 const state = {
   date: getBaroCurrentDate(),
   "comment-63778": JSON.stringify({
-    left: 0.12,
-    top: 0.34,
-    symbol: "☠️",
-    sessionId: "ABC"
+    test1:{
+      left:0.1,
+      top:0.2,
+      symbol:"☠️",
+      sessionId:"ABC"
+    },
+    test2:{
+      left:0.2,
+      top:0.3,
+      symbol:"☠️",
+      sessionId:"ABC"
+    },
+    test3:{
+      left:0.3,
+      top:0.4,
+      symbol:"☠️",
+      sessionId:"ABC"
+    }
   })
 };
 
