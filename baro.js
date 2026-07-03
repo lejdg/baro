@@ -7,12 +7,7 @@
   let baroDraggingId = null;   // ← statt baroIsDragging: trackt welches Element gezogen wird
   let baroLastHash = null;
 
-  function getRealBoardId(){
-  const match = window.location.pathname.match(/[A-F0-9-]{36}/);
-  return match ? match[0] : null;
-}
-
-const baroPdBoardId = getRealBoardId();
+  const baroPdBoardId = "7018";
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
 
   function normalizeSymbolObject(obj){
@@ -59,43 +54,18 @@ const baroPdBoardId = getRealBoardId();
     $("#symbol-display").text(baroMySymbol);
   }
 
+  function saveAllSymbols(){
+    $.ajax({
+      type: "POST",
+      url: "/PdBoard/AddStaticTeambaroResult",
+      data: {
+        PdBoardId: baroPdBoardId,
+        happy: 0, normal: 0, sad: 0, locked: false,
+        chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
+      }
+    });
+  }
 
-
-function saveAllSymbols(){
-
-  const data = {};
-
-  // Datum setzen
-  data.date = getBaroCurrentDate();
-
-  // deine Symbole umwandeln
-  Object.values(baroAllSymbols).forEach((sym, index) => {
-    const id = sym.sessionId || ("temp" + index);
-
-    // das ist wichtig: SERVER WILL baroXXXXX
-    const key = "baro" + id.replace(/\D/g, '').slice(-5);
-
-    data[key] = sym.symbol;
-
-    // optional Kommentar (leer lassen)
-    data["comment-" + id] = "";
-  });
-
-  $.ajax({
-    type: "POST",   // ggf. GET testen!
-    url: "/PDboard/GetTeamBaroChkPlace",
-    data: {
-      pdBoardId: baroPdBoardId,
-      ...data
-    },
-    success: function(res){
-      console.log("✅ gespeichert");
-    },
-    error: function(err){
-      console.log("❌ Fehler:", err.responseText);
-    }
-  });
-}
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
     const $container = $("#container");
     const w = $container.width();
