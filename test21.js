@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 20");
+  console.log("BARO VERSION 21");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -74,29 +74,39 @@
   }
 
 function saveAllSymbols(){
-const state = {
-  date: getBaroCurrentDate(),
-  "comment-63778": JSON.stringify({
-    test1:{
-      left:0.1,
-      top:0.2,
-      symbol:"☠️",
-      sessionId:"ABC"
+
+  const state = {
+    date: getBaroCurrentDate(),
+    "comment-63778":
+      "__BARO__" + JSON.stringify(baroAllSymbols)
+  };
+
+  console.log("SAVE STATE", state);
+
+  $.ajax({
+
+    type: "POST",
+    url: "/PdBoard/AddStaticTeambaroResult",
+
+    data: {
+      pdBoardId: baroPdBoardId,
+      happy: 0,
+      normal: 0,
+      sad: 0,
+      locked: false,
+      chkPlace: JSON.stringify(state)
     },
-    test2:{
-      left:0.2,
-      top:0.3,
-      symbol:"☠️",
-      sessionId:"ABC"
+
+    success: function(){
+      console.log("GESPEICHERT");
     },
-    test3:{
-      left:0.3,
-      top:0.4,
-      symbol:"☠️",
-      sessionId:"ABC"
+
+    error: function(xhr){
+      console.log("FEHLER", xhr.status);
     }
-  })
-};
+
+  });
+}
 
 
 
