@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 21");
+  console.log("BARO VERSION 22");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -106,39 +106,12 @@ function saveAllSymbols(){
     }
 
   });
-}
-
-
-
-  console.log(state);
-
-  $.ajax({
-
-    type: "POST",
-    url: "/PdBoard/AddStaticTeambaroResult",
-
-    data: {
-      pdBoardId: baroPdBoardId,
-      happy: 0,
-      normal: 0,
-      sad: 0,
-      locked: false,
-      chkPlace: JSON.stringify(state)
-    },
-
-    success: function(){
-      console.log("GESPEICHERT");
-    },
-
-    error: function(xhr){
-      console.log("FEHLER", xhr.status);
-    }
-
-  });
 
 }
 
-  function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
+
+
+function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
 
     const $container = $("#container");
 
