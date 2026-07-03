@@ -1,13 +1,15 @@
-
 window.addEventListener("load", function(){
 
     console.log("LOAD");
-    console.log("jQuery", typeof $);
+
+    console.log("Container:", $("#container").length);
+    console.log("Test:", $("#test").length);
 
     $("#test").draggable({
         containment:"#container",
+
         stop:function(e,ui){
-            console.log(ui.position);
+            console.log("Position", ui.position);
         }
     });
 
