@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  console.log("BARO VERSION 24");
+  console.log("BARO VERSION 25");
 
   let baroSessionId = null;
   let baroMySymbol = null;
@@ -130,7 +130,7 @@ function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine
     $container.append($s);
 
     if(isMine){
-
+console.log("DRAG BIND", id);
       $s.draggable({
 
         containment: document.getElementById("container"),
