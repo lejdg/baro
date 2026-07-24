@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-
+console.log("DG BARO VERSION 1");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
