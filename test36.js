@@ -136,7 +136,37 @@ console.log(
 
 window.setTimeout(function(){
 
+  console.log(
+  "IS FUNCTION",
+  $.isFunction($.fn.draggable)
+);
+
+console.log(
+  "WIDGET FACTORY",
+  typeof $.widget
+);
+
+console.log(
+  "MOUSE",
+  $.ui.mouse
+);
+
+console.log(
+  "DRAGGABLE PROTOTYPE",
+  $.ui.draggable.prototype
+);
+  
+try {
+
   $("#" + id).draggable();
+
+  console.log("DRAG CALL OK");
+
+} catch(ex) {
+
+  console.log("DRAG ERROR", ex);
+
+}
 
   console.log(
     "DELAY HAS CLASS",
