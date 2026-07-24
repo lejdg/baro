@@ -7,7 +7,7 @@ console.log("DG BARO VERSION 1.0");
   let baroDraggingId = null;   // ← statt baroIsDragging: trackt welches Element gezogen wird
   let baroLastHash = null;
 
-  const baroPdBoardId = "7018";
+  const baropdBoardId = "7018";
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
 
   function normalizeSymbolObject(obj){
@@ -59,7 +59,7 @@ console.log("DG BARO VERSION 1.0");
       type: "POST",
       url: "/PdBoard/AddStaticTeambaroResult",
       data: {
-        PdBoardId: baroPdBoardId,
+        pdBoardId: baropdBoardId,
         happy: 0, normal: 0, sad: 0, locked: false,
         chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
       }
@@ -209,7 +209,7 @@ return $s;
     $.ajax({
       type: "GET",
       url: "/PdBoard/GetTeamBaroChkPlace",
-      data: { PdBoardId: baroPdBoardId },
+      data: { pdBoardId: baropdBoardId },
       success: function(resp){
         if(!resp) return;
         let data;
