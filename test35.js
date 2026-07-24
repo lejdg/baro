@@ -124,8 +124,41 @@ if(isMine){
   console.log("UI DRAGGABLE", $.ui ? $.ui.draggable : "NO UI");
   console.log("DOM ELEMENT", document.getElementById(id));
 
+  console.log(
+  "NODE CONNECTED",
+  document.getElementById(id).isConnected
+);
+
+console.log(
+  "LENGTH",
+  $("#" + id).length
+);
+
+window.setTimeout(function(){
+
   $("#" + id).draggable();
 
+  console.log(
+    "DELAY HAS CLASS",
+    $("#" + id).hasClass("ui-draggable")
+  );
+
+  console.log(
+    "DELAY DATA",
+    $("#" + id).data("ui-draggable")
+  );
+
+}, 100);
+
+console.log(
+  "CLASS AFTER",
+  $("#" + id)[0].className
+);
+
+console.log(
+  "DATA AFTER",
+  $("#" + id).data()
+);
   console.log(
     "HAS CLASS",
     $("#" + id).hasClass("ui-draggable")
