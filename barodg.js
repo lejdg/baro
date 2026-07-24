@@ -79,29 +79,36 @@
 
     $container.append($s);
 
-    if(isMine){
-      $s.draggable({
-        containment: "#container",
-        start: (e, ui) => {
-          baroDraggingId = id;   // ← merke welches Element gezogen wird
-        },
-        stop: (e, ui) => {
-          baroDraggingId = null; // ← freigeben
-          const w2 = $("#container").width();
-          const h2 = $("#container").height();
-          baroAllSymbols[id] = {
-            left: +(ui.position.left / w2).toFixed(5),
-            top:  +(ui.position.top  / h2).toFixed(5),
-            symbol: baroMySymbol,
-            sessionId: baroSessionId
-          };
-          saveAllSymbols();
-        }
-      });
+if(isMine){
+
+  new $.ui.draggable({
+
+    containment: "#container",
+
+    start: function(){
+
+      baroDraggingId = id;
+    },
+
+    stop: function(e, ui){
+
+      baroDraggingId = null;
+
+      const w2 = $("#container").width();
+      const h2 = $("#container").height();
+
+      baroAllSymbols[id] = {
+        left: +(ui.position.left / w2).toFixed(5),
+        top: +(ui.position.top / h2).toFixed(5),
+        symbol: baroMySymbol,
+        sessionId: baroSessionId
+      };
+
+      saveAllSymbols();
     }
 
-    return $s;
-  }
+  }, $s[0]);
+}
 
   function addMySymbols(){
     const existing = Object.values(baroAllSymbols).filter(s => s.sessionId === baroSessionId);
