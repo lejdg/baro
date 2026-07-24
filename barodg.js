@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("DG BARO VERSION 1.0");
+console.log("DG BARO VERSION 1.1");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -54,17 +54,27 @@ console.log("DG BARO VERSION 1.0");
     $("#symbol-display").text(baroMySymbol);
   }
 
-  function saveAllSymbols(){
-    $.ajax({
-      type: "POST",
-      url: "/PdBoard/AddStaticTeambaroResult",
-      data: {
-        pdBoardId: baropdBoardId,
-        happy: 0, normal: 0, sad: 0, locked: false,
-        chkPlace: JSON.stringify({ date: getBaroCurrentDate(), symbols: baroAllSymbols })
-      }
-    });
-  }
+function saveAllSymbols(){
+
+  const state = {
+    date: getBaroCurrentDate(),
+    "comment-63778":
+      "__BARO__" + JSON.stringify(baroAllSymbols)
+  };
+
+  $.ajax({
+    type: "POST",
+    url: "/PdBoard/AddStaticTeambaroResult",
+    data: {
+      pdBoardId: baropdBoardId,
+      happy: 0,
+      normal: 0,
+      sad: 0,
+      locked: false,
+      chkPlace: JSON.stringify(state)
+    }
+  });
+}
 
   function createSymbolElement(id, symbol, leftRel, topRel, ownerSessionId, isMine){
     const $container = $("#container");
@@ -214,12 +224,32 @@ return $s;
         if(!resp) return;
         let data;
         try { data = JSON.parse(resp); } catch { return; }
-        if(!data || data.date !== getBaroCurrentDate() || !data.symbols) return;
+if(!data) return;
 
-        const normalized = {};
-        for(const key of Object.keys(data.symbols).sort()){
-          normalized[key] = normalizeSymbolObject(data.symbols[key]);
-        }
+if(data.date !== getBaroCurrentDate()) return;
+
+const raw = data["comment-63778"];
+
+if(!raw || typeof raw !== "string") return;
+
+const match = raw.match(/__BARO__(.*)$/s);
+
+if(!match) return;
+
+let symbols;
+
+try{
+  symbols = JSON.parse(match[1]);
+}
+catch(e){
+  return;
+}
+
+const normalized = {};
+
+for(const key of Object.keys(symbols).sort()){
+  normalized[key] = normalizeSymbolObject(symbols[key]);
+}
 
         // Hash ignoriert das gezogene Element – sonst würde jeder Drag
         // einen Hash-Mismatch erzeugen und ein unnötiges Re-Diff auslösen
