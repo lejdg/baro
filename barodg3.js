@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("DG BARO VERSION 1.1");
+console.log("DG BARO VERSION 1.2");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -52,6 +52,37 @@ console.log("DG BARO VERSION 1.1");
       localStorage.setItem("barometer_my_symbol", baroMySymbol);
     }
     $("#symbol-display").text(baroMySymbol);
+    $("#symbol-display")
+  .css("cursor", "pointer")
+  .attr("title", "Symbol wechseln")
+  .off("click")
+  .on("click", function(){
+
+    const existing = Object.values(baroAllSymbols)
+      .filter(s => s.sessionId === baroSessionId);
+
+    if(existing.length > 0){
+      alert("Bitte zuerst deine Symbole entfernen, bevor du das Symbol wechselst.");
+      return;
+    }
+
+    let idx = baroAdrKennzeichen.indexOf(baroMySymbol);
+
+    idx++;
+
+    if(idx >= baroAdrKennzeichen.length){
+      idx = 0;
+    }
+
+    baroMySymbol = baroAdrKennzeichen[idx];
+
+    localStorage.setItem(
+      "barometer_my_symbol",
+      baroMySymbol
+    );
+
+    $("#symbol-display").text(baroMySymbol);
+  });
   }
 
 function saveAllSymbols(){
