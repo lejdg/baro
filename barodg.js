@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("DG BARO VERSION 1");
+console.log("DG BARO VERSION 1.0");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -109,7 +109,9 @@ if(isMine){
 
   }, $s[0]);
 }
-
+return $s;
+}
+  
   function addMySymbols(){
     const existing = Object.values(baroAllSymbols).filter(s => s.sessionId === baroSessionId);
     if(existing.length >= 3){
