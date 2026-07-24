@@ -7,7 +7,7 @@ console.log("DG BARO VERSION 1.2");
   let baroDraggingId = null;   // ← statt baroIsDragging: trackt welches Element gezogen wird
   let baroLastHash = null;
 
-  const baropdBoardId = "7018";
+  const baropdBoardId = document.getElementById("PdBoardId").value;
   const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
 
   function normalizeSymbolObject(obj){
