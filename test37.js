@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("BARO VERSION 25");
+console.log("BARO VERSION 26");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -156,17 +156,46 @@ console.log(
   $.ui.draggable.prototype
 );
   
-try {
+new $.ui.draggable({
 
-  $("#" + id).draggable();
+    containment: "#container",
 
-  console.log("DRAG CALL OK");
+    start: function(){
 
-} catch(ex) {
+        console.log("START DRAG", id);
 
-  console.log("DRAG ERROR", ex);
+        baroDraggingId = id;
+    },
 
-}
+    stop: function(e, ui){
+
+        console.log("STOP DRAG", id);
+
+        baroDraggingId = null;
+
+        const w2 = $("#container").width();
+        const h2 = $("#container").height();
+
+        baroAllSymbols[id] = {
+
+            left: +(ui.position.left / w2).toFixed(5),
+
+            top: +(ui.position.top / h2).toFixed(5),
+
+            symbol: baroMySymbol,
+
+            sessionId: baroSessionId
+        };
+
+        saveAllSymbols();
+    }
+
+}, $s[0]);
+
+  console.log(
+  "UI DRAG DATA",
+  $s.data("ui-draggable")
+);
 
   console.log(
     "DELAY HAS CLASS",
