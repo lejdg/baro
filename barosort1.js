@@ -1,5 +1,5 @@
 (function(){
-console.log("Sort BARO VERSION 1.0");
+console.log("Sort BARO VERSION 1.1");
   const RESET_FLAG = "barometer_session_reset_done";
 
   if(!localStorage.getItem(RESET_FLAG)){
@@ -125,7 +125,7 @@ function saveAllSymbols(){
 
   const state = {
     date: getBaroCurrentDate(),
-    "comment-63778":
+    "comment-59269":
       "__BARO__" + JSON.stringify(baroAllSymbols)
   };
 
