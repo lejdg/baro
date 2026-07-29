@@ -1,5 +1,5 @@
 (function(){
-console.log("Sort BARO VERSION 1.1");
+console.log("Sort BARO VERSION 1.2");
   const RESET_FLAG = "barometer_session_reset_done";
 
   if(!localStorage.getItem(RESET_FLAG)){
@@ -22,7 +22,7 @@ let baroAllSymbols = {};
 let baroDraggingId = null;   // ← statt baroIsDragging: merkt sich welches Element
 let baroLastHash = null;
 
-const baroPdBoardId =
+const baropdBoardId =
   document.getElementById("PdBoardId").value;
 
 const baroColorPalette = [
@@ -133,7 +133,7 @@ function saveAllSymbols(){
     type: "POST",
     url: "/PdBoard/AddStaticTeambaroResult",
     data: {
-      pdBoardId: baroPdBoardId,
+      pdBoardId: baropdBoardId,
       happy: 0,
       normal: 0,
       sad: 0,
@@ -299,7 +299,7 @@ function loadAllSymbols(){
   $.ajax({
     type: "GET",
     url: "/PdBoard/GetTeamBaroChkPlace",
-    data: { pdBoardId: baroPdBoardId },
+    data: { pdBoardId: baropdBoardId },
     success: function(resp){
       if(!resp) return;
 
