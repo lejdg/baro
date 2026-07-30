@@ -1,5 +1,5 @@
 (function(){
-console.log("Sort BARO VERSION 1.3");
+console.log("Sort BARO VERSION 1.4");
   const RESET_FLAG = "barometer_session_reset_done";
 
   if(!localStorage.getItem(RESET_FLAG)){
