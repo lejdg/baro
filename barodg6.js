@@ -9,6 +9,7 @@ console.log("DG BARO VERSION 1.4");
 
   const baropdBoardId = document.getElementById("PdBoardId").value;
   const baroAdrKennzeichen = ["🐶","🐱","🦊","🐻","🐼","🦁","🐯","🐨","🐵","🐸"];
+  'const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
   const BARO_SYMBOL_KEY = "barometer_my_symbol_v2";
 
   function normalizeSymbolObject(obj){
