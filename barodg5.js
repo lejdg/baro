@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("DG BARO VERSION 1.2");
+console.log("DG BARO VERSION 1.3");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -40,6 +40,48 @@ console.log("DG BARO VERSION 1.2");
     return hash;
   }
 
+  /* ──────────────────────────────────────────────────────
+     NEU: Kontrolle auf eindeutige Symbole zwischen Usern
+  ────────────────────────────────────────────────────── */
+  function getSymbolsUsedByOthers(){
+    const used = new Set();
+    for(const val of Object.values(baroAllSymbols)){
+      if(val.sessionId !== baroSessionId){
+        used.add(val.symbol);
+      }
+    }
+    return used;
+  }
+
+  function pickNextAvailableSymbol(preferred){
+    const used = getSymbolsUsedByOthers();
+    if(!used.has(preferred)) return preferred;
+
+    const startIdx = baroAdrKennzeichen.indexOf(preferred);
+    for(let i = 1; i <= baroAdrKennzeichen.length; i++){
+      const idx = (startIdx + i) % baroAdrKennzeichen.length;
+      const candidate = baroAdrKennzeichen[idx];
+      if(!used.has(candidate)) return candidate;
+    }
+    // Alle Symbole vergeben -> Fallback: bevorzugtes Symbol behalten
+    return preferred;
+  }
+
+  function ensureUniqueSymbol(){
+    // Nur automatisch wechseln, solange ich selbst noch keine Symbole
+    // platziert habe – sonst würde es inkonsistent zu meinen liegenden
+    // Symbolen werden (die tragen ihr eigenes "symbol"-Feld schon fest).
+    const ownPlaced = Object.values(baroAllSymbols).some(s => s.sessionId === baroSessionId);
+    if(ownPlaced) return;
+
+    const next = pickNextAvailableSymbol(baroMySymbol);
+    if(next !== baroMySymbol){
+      baroMySymbol = next;
+      localStorage.setItem("barometer_my_symbol", baroMySymbol);
+      $("#symbol-display").text(baroMySymbol);
+    }
+  }
+
   function initializeSession(){
     baroSessionId = localStorage.getItem("barometer_session_id");
     if(!baroSessionId){
@@ -66,15 +108,21 @@ console.log("DG BARO VERSION 1.2");
       return;
     }
 
+    const used = getSymbolsUsedByOthers();
     let idx = baroAdrKennzeichen.indexOf(baroMySymbol);
+    let nextSymbol = baroMySymbol;
 
-    idx++;
-
-    if(idx >= baroAdrKennzeichen.length){
-      idx = 0;
+    // Zyklisch weiterschalten, dabei von anderen belegte Symbole überspringen
+    for(let i = 1; i <= baroAdrKennzeichen.length; i++){
+      const candidateIdx = (idx + i) % baroAdrKennzeichen.length;
+      const candidate = baroAdrKennzeichen[candidateIdx];
+      if(!used.has(candidate)){
+        nextSymbol = candidate;
+        break;
+      }
     }
 
-    baroMySymbol = baroAdrKennzeichen[idx];
+    baroMySymbol = nextSymbol;
 
     localStorage.setItem(
       "barometer_my_symbol",
@@ -159,6 +207,11 @@ return $s;
       alert("Du hast bereits 3 Symbole!");
       return;
     }
+
+    // Letzte Sicherheitsprüfung direkt vor dem Platzieren (Race-Condition-Schutz):
+    // falls zwischenzeitlich ein anderer User genau mein Symbol belegt hat.
+    ensureUniqueSymbol();
+
     const $c = $("#container");
     const CW = $c.width(), CH = $c.height();
 
@@ -293,6 +346,10 @@ for(const key of Object.keys(symbols).sort()){
         baroLastHash = newHash;
 
         applySymbolDiff(normalized);
+
+        // NEU: nach jedem Update prüfen, ob mein aktuelles Symbol
+        // inzwischen von jemand anderem belegt wurde
+        ensureUniqueSymbol();
       }
     });
   }
