@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-console.log("DG BARO VERSION 1.3");
+console.log("DG BARO VERSION 1.4");
   let baroSessionId = null;
   let baroMySymbol = null;
   let baroAllSymbols = {};
@@ -8,7 +8,8 @@ console.log("DG BARO VERSION 1.3");
   let baroLastHash = null;
 
   const baropdBoardId = document.getElementById("PdBoardId").value;
-  const baroAdrKennzeichen = ["💣","🧯","🔥","⚡","🔆","☠️","☣️","🧪","⚠️","☢"];
+  const baroAdrKennzeichen = ["🐶","🐱","🦊","🐻","🐼","🦁","🐯","🐨","🐵","🐸"];
+  const BARO_SYMBOL_KEY = "barometer_my_symbol_v2";
 
   function normalizeSymbolObject(obj){
     return {
@@ -77,7 +78,7 @@ console.log("DG BARO VERSION 1.3");
     const next = pickNextAvailableSymbol(baroMySymbol);
     if(next !== baroMySymbol){
       baroMySymbol = next;
-      localStorage.setItem("barometer_my_symbol", baroMySymbol);
+      localStorage.setItem(BARO_SYMBOL_KEY, baroMySymbol);
       $("#symbol-display").text(baroMySymbol);
     }
   }
@@ -88,10 +89,10 @@ console.log("DG BARO VERSION 1.3");
       baroSessionId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2,9);
       localStorage.setItem("barometer_session_id", baroSessionId);
     }
-    baroMySymbol = localStorage.getItem("barometer_my_symbol");
+    baroMySymbol = localStorage.getItem(BARO_SYMBOL_KEY);
     if(!baroMySymbol){
       baroMySymbol = baroAdrKennzeichen[Math.floor(Math.random() * baroAdrKennzeichen.length)];
-      localStorage.setItem("barometer_my_symbol", baroMySymbol);
+      localStorage.setItem(BARO_SYMBOL_KEY, baroMySymbol);
     }
     $("#symbol-display").text(baroMySymbol);
     $("#symbol-display")
@@ -124,10 +125,7 @@ console.log("DG BARO VERSION 1.3");
 
     baroMySymbol = nextSymbol;
 
-    localStorage.setItem(
-      "barometer_my_symbol",
-      baroMySymbol
-    );
+    localStorage.setItem(BARO_SYMBOL_KEY, baroMySymbol);
 
     $("#symbol-display").text(baroMySymbol);
   });
